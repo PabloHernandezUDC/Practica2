@@ -1,5 +1,6 @@
 # Pablo Hernandez Martinez, pablo.hernandez.martinez@udc.es - Marcelo Ferreiro Sánchez, marcelo.fsanchez@udc.es
-import sys, pandas
+import sys
+import pandas as pd
 from avion import Avion
 from cola import Cola
 
@@ -21,13 +22,12 @@ def parse_params(params):
     
     return Avion(nombre, prioridad)
 
-def run(path, time = 0):
+def run(path):
     '''
     '''
     with open(path) as f:
-        lines = f.readlines()
         cola_de_despegues = Cola()
-        for elemento in lines:
+        for elemento in f.readlines():
             cola_de_despegues.enqueue(parse_params(elemento.split()))
         
         lista_de_colas_de_pista = [
@@ -38,6 +38,15 @@ def run(path, time = 0):
             Cola(),
         ]
 
+        wait_stats = {
+                1: [],
+                2: [],
+                3: [],
+                4: [],
+                5: [],
+            }
+        
+        time = 0
         while True:
             # modificar y mostrar el tiempo
             time += 1
@@ -54,6 +63,7 @@ def run(path, time = 0):
                     TActual = time
                 ))
 
+            #comprobar si queda algún avión en alguna cola de despegue
             for i in lista_de_colas_de_pista:
                 if i.is_empty() == False:
                     quedan_aviones = True
@@ -67,6 +77,7 @@ def run(path, time = 0):
                     for i in lista_de_colas_de_pista:
                         if i.is_empty() == False:
                             despegue = i.dequeue()
+                            wait_stats[despegue.get_priority()].append(time - despegue.get_entry_time())
                             print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA}\tt es {TActual}'.format(
                                 IDVuelo = despegue.get_name(),
                                 Clase = despegue.get_priority(),
@@ -76,13 +87,14 @@ def run(path, time = 0):
                             break
                         else:
                             pass
-                    
+                
+                # reprogramar los vuelos que tengan más de 20 unidades de retraso
                 for i in lista_de_colas_de_pista:
                     if i.is_empty() == False:
                         for avion in i.data:
-                            if (avion.get_entry_time() - time) > 20 and avion.get_priority() > 1:
+                            if (time - avion.get_entry_time()) > 20 and avion.get_priority() > 1:
                                 avion = i.dequeue()
-                                avion.set_priority(avion.get_priority + 1)
+                                avion.set_priority(avion.get_priority() - 1)
                                 avion.set_entry_time(time)
                                 lista_de_colas_de_pista[avion.get_priority()].enqueue(avion)
 

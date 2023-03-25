@@ -93,7 +93,7 @@ def run(path):
                     if i.is_empty() == False:
                         for avion in i.data:
                             if (time - avion.get_entry_time()) > 20 and avion.get_priority() > 1:
-                                avion = i.dequeue()
+                                i.remove(avion)
                                 avion.set_priority(avion.get_priority() - 1)
                                 avion.set_entry_time(time)
                                 lista_de_colas_de_pista[avion.get_priority()].enqueue(avion)

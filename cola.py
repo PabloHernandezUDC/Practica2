@@ -24,6 +24,15 @@ class Cola():
             return e
         else:
             return None
+
+    def remove(self, r):
+        '''
+        '''
+        if self.is_empty() is False:
+            self.data.remove(r)
+            self.size -= 1
+        else:
+            pass
     
     def first(self):
         '''

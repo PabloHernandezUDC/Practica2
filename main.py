@@ -1,26 +1,27 @@
 # Pablo Hernandez Martinez, pablo.hernandez.martinez@udc.es - Marcelo Ferreiro Sánchez, marcelo.fsanchez@udc.es
 import sys
 import pandas as pd
+import numpy as np
 from avion import Avion
 from cola import Cola
 
 def parse_params(params):
     '''
     '''
-    nombre, prioridad = params[0], params[1].lower()
+    nombre, clase = params[0], params[1].lower()
     
-    if prioridad == 'domestico':
+    if clase == 'domestico':
         prioridad = 1
-    elif prioridad == 'privado':
+    elif clase == 'privado':
         prioridad = 2
-    elif prioridad == 'regular':
+    elif clase == 'regular':
         prioridad = 3
-    elif prioridad == 'charter':
+    elif clase == 'charter':
         prioridad = 4
-    elif prioridad == 'transoceanico':
+    elif clase == 'transoceanico':
         prioridad = 5
     
-    return Avion(nombre, prioridad)
+    return Avion(nombre, clase, prioridad)
 
 def run(path):
     '''
@@ -39,11 +40,11 @@ def run(path):
         ]
 
         wait_stats = {
-                1: [],
-                2: [],
-                3: [],
-                4: [],
-                5: [],
+                'domestico': [],
+                'privado': [],
+                'regular': [],
+                'charter': [],
+                'transoceanico': [],
             }
         
         time = 0
@@ -77,7 +78,11 @@ def run(path):
                     for i in lista_de_colas_de_pista:
                         if i.is_empty() == False:
                             despegue = i.dequeue()
-                            wait_stats[despegue.get_priority()].append(time - despegue.get_entry_time())
+                            
+                            current_plane_wait_time = time - despegue.get_entry_time()
+                            despegue.set_wait_time(current_plane_wait_time)
+                            wait_stats[despegue.get_flight_class()].append(current_plane_wait_time)
+                            
                             print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA}\tt es {TActual}'.format(
                                 IDVuelo = despegue.get_name(),
                                 Clase = despegue.get_priority(),
@@ -99,9 +104,32 @@ def run(path):
                                 lista_de_colas_de_pista[avion.get_priority()].enqueue(avion)
 
             else:
+                wait_stats_series = []
+                for fila in wait_stats:
+                    wait_stats_series.append(pd.Series(wait_stats[fila]))
+
+                clases = ['Doméstico',
+                          'Privado',
+                          'Regular',
+                          'Charter',
+                          'Transoceánico']
+                
+                result = {}
+                for clase in clases:
+                    result[clase] = wait_stats_series[clases.index(clase)].mean()
+                
+                print('\n---------------------------------------------')
+                print('| Clase\t\t| Tiempo de espera promedio |')
+                print('---------------------------------------------')
+                for i in result:
+                    print('| {c}\t| {m}\t\t\t    |'.format(
+                        c = i,
+                        m = round(result[i], 2)
+                        
+                    ))
+                print('---------------------------------------------\n')
+                
                 break
-            
-        return None
 
 if __name__ == "__main__":
     run(sys.argv[1])

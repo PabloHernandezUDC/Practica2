@@ -31,13 +31,11 @@ def run(path):
         for elemento in f.readlines():
             cola_de_despegues.enqueue(parse_params(elemento.split()))
 
-        wait_stats = {
-            'domestico': [],
-            'privado': [],
-            'regular': [],
-            'charter': [],
-            'transoceanico': []
-        }
+        stats = pd.DataFrame({
+            'Nombre': [],
+            'Clase': [],
+            'Tiempo de espera': []
+        })
         
         time = 0
         while True:
@@ -55,6 +53,10 @@ def run(path):
                     Clase = primer_vuelo.get_priority(),
                     TActual = time
                 ))
+                
+                current_stats = pd.DataFrame({'Nombre': primer_vuelo.get_name(), 'Clase': primer_vuelo.get_flight_class(), 'Tiempo de espera': [0]})
+                pd.concat([stats, current_stats])
+                
 
             #comprobar si queda algún avión en alguna cola de despegue
             for i in lista_de_colas_de_pista:
@@ -71,7 +73,11 @@ def run(path):
                         if i.is_empty() is False:
                             despegue = i.dequeue()
                             despegue.set_wait_time(time - despegue.get_entry_time())
-                            wait_stats[despegue.get_flight_class()].append(despegue.get_wait_time())
+                            # indice del avion que despega = 
+                            # df.loc[df['col1'] == value]
+                            indice = stats.loc[stats['Nombre'] == despegue.get_name()]
+                            stats.at[indice, 'Tiempo de espera']
+                            
                             
                             print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA}\tt: {TActual}'.format(
                                 IDVuelo = despegue.get_name(),
@@ -89,10 +95,18 @@ def run(path):
                             i.remove(avion)
                             avion.set_priority(avion.get_priority() - 1)
                             avion.set_entry_time(time)
+                            print('Entrando en pista vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
+                                IDVuelo = primer_vuelo.get_name(),
+                                Clase = primer_vuelo.get_priority(),
+                                TActual = time
+                            ))
                             lista_de_colas_de_pista[avion.get_priority()].enqueue(avion)
 
             else: # si ya no quedan aviones en ninguna de las dos colas
-                wait_stats_series = [pd.Series(wait_stats[fila], name = fila) for fila in wait_stats] 
+                print(stats)
+                
+                '''
+                wait_stats_series = [pd.Series(stats[fila], name = fila) for fila in stats] 
                 
                 print('\n---------------------------------------------')
                 print('| Clase\t\t| Tiempo de espera promedio |')
@@ -103,6 +117,7 @@ def run(path):
                         m = round(serie.mean(), 2)
                     ))
                 print('---------------------------------------------\n')
+                '''
                 break
 
 if __name__ == "__main__":

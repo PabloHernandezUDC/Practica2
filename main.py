@@ -41,23 +41,25 @@ def run(path):
         while True:
             # modificar y mostrar el tiempo
             time += 1
-            print('t:', time)
+            #print('t:', time)
                         
             if cola_de_despegues.is_empty() is False: # coger el primer vuelo, registrar el tiempo de despegue y quitarlo de la cola de despegues
                 primer_vuelo = cola_de_despegues.dequeue()
                 primer_vuelo.set_entry_time(time)
                 lista_de_colas_de_pista[primer_vuelo.get_priority() - 1].enqueue(primer_vuelo)
                 
-                print('Entrando en pista vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
-                    IDVuelo = primer_vuelo.get_name(),
-                    Clase = primer_vuelo.get_priority(),
-                    TActual = time
-                ))
+                # print('Entrando en pista vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
+                #     IDVuelo = primer_vuelo.get_name(),
+                #     Clase = primer_vuelo.get_priority(),
+                #     TActual = time
+                # ))
                 
                 current_stats = pd.DataFrame({'Nombre': primer_vuelo.get_name(), 'Clase': primer_vuelo.get_flight_class(), 'Tiempo de espera': [0]})
+                print('------------------------------------------')
+                print(current_stats)
                 pd.concat([stats, current_stats])
+                print(stats)
                 
-
             #comprobar si queda algún avión en alguna cola de despegue
             for i in lista_de_colas_de_pista:
                 if i.is_empty() is False:
@@ -75,16 +77,18 @@ def run(path):
                             despegue.set_wait_time(time - despegue.get_entry_time())
                             # indice del avion que despega = 
                             # df.loc[df['col1'] == value]
-                            indice = stats.loc[stats['Nombre'] == despegue.get_name()]
-                            stats.at[indice, 'Tiempo de espera']
+                            
+                            #indice = stats.index[stats['Nombre'] == despegue.get_name()].tolist()
+                            #print('asdfghsdfghjklkjhgfdsadfghjkjhgfdsjklñ', indice)
+                            #stats.at[indice, 'Tiempo de espera']
                             
                             
-                            print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA}\tt: {TActual}'.format(
-                                IDVuelo = despegue.get_name(),
-                                Clase = despegue.get_priority(),
-                                TEntrada_PISTA = despegue.get_entry_time(),
-                                TActual = time
-                            ))
+                            #print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA}\tt: {TActual}'.format(
+                            #    IDVuelo = despegue.get_name(),
+                            #    Clase = despegue.get_priority(),
+                            #    TEntrada_PISTA = despegue.get_entry_time(),
+                            #    TActual = time
+                            #))
                             break
                 
                 # reprogramar los vuelos que tengan más de 20 unidades de retraso
@@ -95,11 +99,11 @@ def run(path):
                             i.remove(avion)
                             avion.set_priority(avion.get_priority() - 1)
                             avion.set_entry_time(time)
-                            print('Entrando en pista vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
-                                IDVuelo = primer_vuelo.get_name(),
-                                Clase = primer_vuelo.get_priority(),
-                                TActual = time
-                            ))
+                            #print('Entrando en pista vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
+                            #    IDVuelo = avion.get_name(),
+                            #    Clase = avion.get_priority(),
+                            #    TActual = time
+                            #))
                             lista_de_colas_de_pista[avion.get_priority()].enqueue(avion)
 
             else: # si ya no quedan aviones en ninguna de las dos colas

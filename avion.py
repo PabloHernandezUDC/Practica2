@@ -1,3 +1,4 @@
+# Pablo Hernandez Martinez, pablo.hernandez.martinez@udc.es - Marcelo Ferreiro Sánchez, marcelo.fsanchez@udc.es
 class Avion():
     '''
     '''

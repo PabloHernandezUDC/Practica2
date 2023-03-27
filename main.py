@@ -83,12 +83,12 @@ def run(path):
                             #stats.at[indice, 'Tiempo de espera']
                             
                             
-                            #print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA}\tt: {TActual}'.format(
-                            #    IDVuelo = despegue.get_name(),
-                            #    Clase = despegue.get_priority(),
-                            #    TEntrada_PISTA = despegue.get_entry_time(),
-                            #    TActual = time
-                            #))
+                            print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA}\tt: {TActual}'.format(
+                                IDVuelo = despegue.get_name(),
+                                Clase = despegue.get_priority(),
+                                TEntrada_PISTA = despegue.get_entry_time(),
+                                TActual = time
+                            ))
                             break
                 
                 # reprogramar los vuelos que tengan más de 20 unidades de retraso
@@ -104,7 +104,7 @@ def run(path):
                             #    Clase = avion.get_priority(),
                             #    TActual = time
                             #))
-                            lista_de_colas_de_pista[avion.get_priority()].enqueue(avion)
+                            lista_de_colas_de_pista[avion.get_priority() - 1].enqueue(avion)
 
             else: # si ya no quedan aviones en ninguna de las dos colas
                 print(stats)

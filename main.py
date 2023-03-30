@@ -67,7 +67,7 @@ def run(path):
                     for i in lista_de_colas_de_pista:
                         if i.is_empty() is False:
                             despegue = i.dequeue()                
-                            print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA}\tt: {TActual}'.format(
+                            print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA} t: {TActual}'.format(
                                 IDVuelo = despegue.get_name(),
                                 Clase = despegue.get_priority(),
                                 TEntrada_PISTA = despegue.get_entry_time(),

@@ -1,7 +1,7 @@
 # Pablo Hernandez Martinez, pablo.hernandez.martinez@udc.es - Marcelo Ferreiro Sánchez, marcelo.fsanchez@udc.es
-import sys
-import warnings
+import sys, warnings
 import pandas as pd
+import matplotlib.pyplot as plt
 from avion import Avion
 from cola import Cola
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -12,18 +12,13 @@ def parse_params(params):
     '''
     '''
     nombre, clase = params[0], params[1].lower()
+    lista_de_clases = ['domestico', 'privado', 'regular', 'charter', 'transoceanico'] # debe estar ordenado de mayor a menor prioridad
     
-    if clase == 'domestico':
-        prioridad = 1
-    elif clase == 'privado':
-        prioridad = 2
-    elif clase == 'regular':
-        prioridad = 3
-    elif clase == 'charter':
-        prioridad = 4
-    elif clase == 'transoceanico':
-        prioridad = 5
-    
+    for i in lista_de_clases:
+        if i == clase:
+            prioridad = lista_de_clases.index(i) + 1
+            break
+        
     return Avion(nombre, clase, prioridad)
 
 def run(path):
@@ -83,14 +78,13 @@ def run(path):
                             stats['Nombre'].append(despegue.get_name())
                             stats['Clase'].append(despegue.get_flight_class())
                             stats['Tiempo de espera'].append(time - despegue.get_entry_time())                            
-
                             break
                 
                 # reprogramar los vuelos que tengan más de 20 unidades de retraso
                 for i in lista_de_colas_de_pista:
                     if i.is_empty() is False:
                         avion = i.first()
-                        if (time - avion.get_entry_time()) > 20 and avion.get_priority() > 1:
+                        if time - avion.get_entry_time() > 20 and avion.get_priority() > 1:
                             i.dequeue()
                             avion.set_priority(avion.get_priority() - 1)
                             avion.set_entry_time(time)
@@ -104,10 +98,11 @@ def run(path):
                                         
             else: # si ya no quedan aviones en ninguna de las dos colas
                 stats = pd.DataFrame(stats)
-                print('\n',
-                      stats.groupby('Clase').mean(),
-                      '\n')
                 break
+    return stats
 
 if __name__ == "__main__":
-    run(sys.argv[1])
+    result = run(sys.argv[1])
+    print('\n', result.groupby('Clase').mean(), '\n')
+    result.plot.scatter(x = "Clase", y = "Tiempo de espera", c = 'Tiempo de espera', colormap = 'RdYlGn_r')
+    plt.show()

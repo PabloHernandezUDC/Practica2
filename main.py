@@ -43,13 +43,13 @@ def run(path):
             print('Tiempo actual:', time)
             
             if cola_de_despegues.is_empty() is False: # coger el primer vuelo, registrar el tiempo de despegue y quitarlo de la cola de despegues
-                primer_vuelo = cola_de_despegues.dequeue()
-                primer_vuelo.set_entry_time(time)
-                lista_de_colas_de_pista[primer_vuelo.get_priority() - 1].enqueue(primer_vuelo)
+                primer_avion = cola_de_despegues.dequeue()
+                primer_avion.set_original_entry_time(time)
+                lista_de_colas_de_pista[primer_avion.get_priority() - 1].enqueue(primer_avion)
                 
                 print('Entrando en pista vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
-                    IDVuelo = primer_vuelo.get_name(),
-                    Clase = primer_vuelo.get_priority(),
+                    IDVuelo = primer_avion.get_name(),
+                    Clase = primer_avion.get_priority(),
                     TActual = time
                 ))
                                                 
@@ -70,38 +70,45 @@ def run(path):
                             print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA} t: {TActual}'.format(
                                 IDVuelo = despegue.get_name(),
                                 Clase = despegue.get_priority(),
-                                TEntrada_PISTA = despegue.get_entry_time(),
+                                TEntrada_PISTA = despegue.get_original_entry_time(),
                                 TActual = time
                             ))
                             
                             # modificar las estadísticas
                             stats['Nombre'].append(despegue.get_name())
                             stats['Clase'].append(despegue.get_flight_class())
-                            stats['Tiempo de espera'].append(time - despegue.get_entry_time())                            
+                            stats['Tiempo de espera'].append(time - despegue.get_original_entry_time())                            
                             break
                 
                 # reprogramar los vuelos que tengan más de 20 unidades de retraso
                 for i in lista_de_colas_de_pista:
                     if i.is_empty() is False:
                         avion = i.first()
-                        if time - avion.get_entry_time() > 20 and avion.get_priority() > 1:
+                        if avion.get_new_entry_time() == 0:
+                            avion.set_wait_time(time - avion.get_original_entry_time())
+                        else:
+                            avion.set_wait_time(time - avion.get_new_entry_time())
+                            
+                        if time - avion.get_wait_time() > 20 and avion.get_priority() > 1:
                             i.dequeue()
                             avion.set_priority(avion.get_priority() - 1)
+                            avion.set_new_entry_time(time)
                             lista_de_colas_de_pista[avion.get_priority() - 1].enqueue(avion)
                             
-                            print('Entrando en pista vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
+                            print('Reubicando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
                                 IDVuelo = avion.get_name(),
                                 Clase = avion.get_priority(),
                                 TActual = time
                             ))
-                                        
+
             else: # si ya no quedan aviones en ninguna de las dos colas
                 stats = pd.DataFrame(stats)
                 break
+
     return stats
 
 if __name__ == "__main__":
     result = run(sys.argv[1])
     print('\n', result.groupby('Clase').mean(), '\n')
-    result.plot.scatter(x = "Clase", y = "Tiempo de espera", c = 'Tiempo de espera', colormap = 'RdYlGn_r')
+    result.plot.scatter(x = "Clase", y = "Tiempo de espera", c = 'Tiempo de espera', colormap = 'viridis')
     plt.show()

@@ -87,7 +87,6 @@ def run(path):
                         if time - avion.get_entry_time() > 20 and avion.get_priority() > 1:
                             i.dequeue()
                             avion.set_priority(avion.get_priority() - 1)
-                            avion.set_entry_time(time)
                             lista_de_colas_de_pista[avion.get_priority() - 1].enqueue(avion)
                             
                             print('Entrando en pista vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(

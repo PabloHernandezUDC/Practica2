@@ -47,10 +47,10 @@ def run(path):
                 primer_avion.set_original_entry_time(time)
                 lista_de_colas_de_pista[primer_avion.get_priority() - 1].enqueue(primer_avion)
                 
-                print('Entrando en pista vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
-                    IDVuelo = primer_avion.get_name(),
-                    Clase = primer_avion.get_priority(),
-                    TActual = time
+                print('Entrando en pista vuelo con ID: {id_vuelo}\tPrioridad: {clase}\tt actual: {t_actual}'.format(
+                    id_vuelo = primer_avion.get_name(),
+                    clase = primer_avion.get_priority(),
+                    t_actual = time
                 ))
                                                 
             #comprobar si queda algún avión en alguna cola de despegue
@@ -67,11 +67,11 @@ def run(path):
                     for i in lista_de_colas_de_pista:
                         if i.is_empty() is False:
                             despegue = i.dequeue()                
-                            print('Despegando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt de entrada en pista: {TEntrada_PISTA} t: {TActual}'.format(
-                                IDVuelo = despegue.get_name(),
-                                Clase = despegue.get_priority(),
-                                TEntrada_PISTA = despegue.get_original_entry_time(),
-                                TActual = time
+                            print('Despegando vuelo con ID: {id_vuelo}\tPrioridad: {clase}\tt de entrada en pista: {t_entrada_pista} t actual: {t_actual}'.format(
+                                id_vuelo = despegue.get_name(),
+                                clase = despegue.get_priority(),
+                                t_entrada_pista = despegue.get_original_entry_time(),
+                                t_actual = time
                             ))
                             
                             # modificar las estadísticas
@@ -95,10 +95,10 @@ def run(path):
                             avion.set_new_entry_time(time)
                             lista_de_colas_de_pista[avion.get_priority() - 1].enqueue(avion)
                             
-                            print('Reubicando vuelo con ID: {IDVuelo}\tPrioridad: {Clase}\tt actual: {TActual}'.format(
-                                IDVuelo = avion.get_name(),
-                                Clase = avion.get_priority(),
-                                TActual = time
+                            print('Reubicando vuelo con ID: {id_vuelo}\tPrioridad: {clase}\tt actual: {t_actual}'.format(
+                                id_vuelo = avion.get_name(),
+                                clase = avion.get_priority(),
+                                t_actual = time
                             ))
 
             else: # si ya no quedan aviones en ninguna de las dos colas

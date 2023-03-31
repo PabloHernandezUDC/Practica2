@@ -4,9 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from avion import Avion
 from cola import Cola
-warnings.simplefilter(action='ignore', category=FutureWarning)
-# solo usamos la librería warnings para que al usuario no le
-# salten las advertencias de que un método está obsoleto
+warnings.simplefilter(action='ignore', category=FutureWarning) # just to avoid printing deprecation warnings
 
 def parse_params(params):
     '''
@@ -38,11 +36,10 @@ def run(path):
         
         time = 0
         while True:
-            # modificar y mostrar el tiempo
             time += 1
             print('Tiempo actual:', time)
             
-            if cola_de_despegues.is_empty() is False: # coger el primer vuelo, registrar el tiempo de despegue y quitarlo de la cola de despegues
+            if cola_de_despegues.is_empty() is False:
                 primer_avion = cola_de_despegues.dequeue()
                 primer_avion.set_original_entry_time(time)
                 lista_de_colas_de_pista[primer_avion.get_priority() - 1].enqueue(primer_avion)
@@ -53,7 +50,6 @@ def run(path):
                     t_actual = time
                 ))
                                                 
-            #comprobar si queda algún avión en alguna cola de despegue
             for i in lista_de_colas_de_pista:
                 if i.is_empty():
                     quedan_aviones = False
@@ -61,8 +57,7 @@ def run(path):
                     quedan_aviones = True
                     break
 
-            if quedan_aviones: # si quedan aviones, hacer que despeguen y gestionar los retrasos
-                # despegue
+            if quedan_aviones:
                 if time % 5 == 0:
                     for i in lista_de_colas_de_pista:
                         if i.is_empty() is False:
@@ -74,13 +69,11 @@ def run(path):
                                 t_actual = time
                             ))
                             
-                            # modificar las estadísticas
                             stats['Nombre'].append(despegue.get_name())
                             stats['Clase'].append(despegue.get_flight_class())
                             stats['Tiempo de espera'].append(time - despegue.get_original_entry_time())                            
                             break
                 
-                # reprogramar los vuelos que tengan más de 20 unidades de retraso
                 for i in lista_de_colas_de_pista:
                     if i.is_empty() is False:
                         avion = i.first()
@@ -101,7 +94,7 @@ def run(path):
                                 t_actual = time
                             ))
 
-            else: # si ya no quedan aviones en ninguna de las dos colas
+            else:
                 stats = pd.DataFrame(stats)
                 break
 

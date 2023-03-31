@@ -10,7 +10,7 @@ def parse_params(params):
     '''
     '''
     nombre, clase = params[0], params[1].lower()
-    lista_de_clases = ['domestico', 'privado', 'regular', 'charter', 'transoceanico'] # la lista debe estar ordenada de mayor a menor prioridad
+    lista_de_clases = ['domestico', 'privado', 'regular', 'charter', 'transoceanico']
     
     for i in lista_de_clases:
         if i == clase:

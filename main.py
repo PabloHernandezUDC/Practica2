@@ -8,6 +8,16 @@ warnings.simplefilter(action='ignore', category=FutureWarning) # just to avoid p
 
 def parse_params(params):
     '''
+    This function reads the data from the text file containing the information about the flights and hands out that data in a format
+    that is functional for the following function.
+    ---------- 
+    params: str 
+        Text line with a certain format that will be used for Avion object creation.
+ 
+    Returns 
+    ------- 
+    Avion
+        Avion object with several parameters that were fetched from the file that was read
     '''
     nombre, clase = params[0], params[1].lower()
     lista_de_clases = ['domestico', 'privado', 'regular', 'charter', 'transoceanico']
@@ -21,24 +31,36 @@ def parse_params(params):
 
 def run(path):
     '''
+    This function runs one iteration of the simulation based on a given text file with a certain format.
+    If the file meets the format criteria, it will be read correctly and characters will be created from the parse_params function.
+    Parameters 
+    ---------- 
+    path: str 
+        File path for the file that will be used. 
+ 
+    Returns 
+    ------- 
+    stats:
+        All of the information that the exercise requires from the program, Name, Class and Waiting time.
     '''
     with open(path) as f:
         cola_de_despegues, lista_de_colas_de_pista = Cola(), [Cola(), Cola(), Cola(), Cola(), Cola()]
-
+        # Here the funcion gets access to the flight data via the parse_params function.
         for elemento in f.readlines():
             cola_de_despegues.enqueue(parse_params(elemento.split()))
 
+        #creates an empty dictionary with the required stats.
         stats = {
             'Nombre': [],
             'Clase': [],
             'Tiempo de espera': []
         }
-        
+        #creates the time loop.
         time = 0
         while True:
             time += 1
             print('Tiempo actual:', time)
-            
+            #This loop enqueues a plane from the flight departures list into the track when the departure queue is not empty.
             if cola_de_despegues.is_empty() is False:
                 primer_avion = cola_de_despegues.dequeue()
                 primer_avion.set_original_entry_time(time)
